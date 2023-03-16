@@ -6,6 +6,8 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
 
 public class Demo : MonoBehaviour
 {
@@ -206,5 +208,10 @@ public class Demo : MonoBehaviour
         // no error code available in non-blocking mode
         BleApi.SubscribeCharacteristic(selectedDeviceId, selectedServiceId, selectedCharacteristicId, false);
         isSubscribed = true;
+    }
+
+    public void GoToLevel()
+    {
+        SceneManager.LoadScene("Level");
     }
 }

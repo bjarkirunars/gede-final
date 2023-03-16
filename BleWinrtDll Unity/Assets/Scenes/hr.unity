@@ -900,8 +900,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2031387673}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: StartStopDeviceScan
+        m_TargetAssemblyTypeName: Demo, Assembly-CSharp
+        m_MethodName: GoToLevel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
