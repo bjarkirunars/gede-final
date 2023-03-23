@@ -86,6 +86,7 @@ public class Demo : MonoBehaviour
                 status = BleApi.PollService(out res, false);
                 if (status == BleApi.ScanStatus.AVAILABLE)
                 {
+                    // Connect if the service is the heart rate service
                     if (res.uuid.Contains("180d"))
                     {
                         SelectService(res.uuid);
@@ -107,6 +108,7 @@ public class Demo : MonoBehaviour
                 status = BleApi.PollCharacteristic(out res, false);
                 if (status == BleApi.ScanStatus.AVAILABLE)
                 {
+                    // Connect to the first one available. Usually works, but maybe not always?
                     SelectCharacteristic(res.uuid);
                     Subscribe();
                 }
@@ -121,7 +123,7 @@ public class Demo : MonoBehaviour
             BleApi.BLEData res = new BleApi.BLEData();
             while (BleApi.PollData(out res, false))
             {
-                subcribeText.text = "HR: " + Convert.ToInt32(BitConverter.ToString(res.buf, 1, 1), 16);
+                subcribeText.text = Convert.ToInt32(BitConverter.ToString(res.buf, 1, 1), 16) + "bpm";
             }
             gameButton.interactable = true;
         }

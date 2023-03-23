@@ -19,19 +19,18 @@ public class HeartRateMonitor : MonoBehaviour
         string selectedServiceId = heartRateCharacteristic.serviceId;
         string selectedCharacteristicId = heartRateCharacteristic.characteristicId;
 
+        // Subscribe to the heartrate monitor again
         BleApi.SubscribeCharacteristic(selectedDeviceId, selectedServiceId, selectedCharacteristicId, false);
         
-
-        // Use the IDs to connect to the heart rate monitor
-        // ...
     }
 
     void Update()
     {
+        // Use the value from the heart rate monitor to display on screen
         BleApi.BLEData res = new BleApi.BLEData();
         while (BleApi.PollData(out res, false))
         {
-            subcribeText.text = "HR: " + Convert.ToInt32(BitConverter.ToString(res.buf, 1, 1), 16);
+            subcribeText.text = Convert.ToInt32(BitConverter.ToString(res.buf, 1, 1), 16) + "bpm";
         }
     }
 }
