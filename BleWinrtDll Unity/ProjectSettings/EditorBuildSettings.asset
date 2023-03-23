@@ -14,4 +14,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/hr.unity
     guid: c5cafc465720fba46ae3a25fbffbb0ef
+  - enabled: 1
+    path: Assets/Scenes/UIStart.unity
+    guid: 4bd10520f014f4c41afac1586e840893
+  - enabled: 1
+    path: Assets/Scenes/UIConnect.unity
+    guid: 36694df9088ee994384719d768fc5681
+  - enabled: 1
+    path: Assets/Scenes/UIHeartrate.unity
+    guid: d18f31de6ff415144941f16cbbef442e
   m_configObjects: {}

@@ -37,6 +37,7 @@ public class Demo : MonoBehaviour
         gameButton.interactable = false;
         scanResultRoot = deviceScanResultProto.transform.parent;
         deviceScanResultProto.transform.SetParent(null);
+        StartDeviceScan();
     }
 
     // Update is called once per frame
@@ -73,7 +74,6 @@ public class Demo : MonoBehaviour
                 else if (status == BleApi.ScanStatus.FINISHED)
                 {
                     isScanningDevices = false;
-                    deviceScanButtonText.text = "Scan devices";
                 }
             } while (status == BleApi.ScanStatus.AVAILABLE);
         }
@@ -143,24 +143,14 @@ public class Demo : MonoBehaviour
         BleApi.Quit();
     }
 
-    public void StartStopDeviceScan()
+    public void StartDeviceScan()
     {
-        if (!isScanningDevices)
-        {
-            // start new scan
-            for (int i = scanResultRoot.childCount - 1; i >= 0; i--)
-                Destroy(scanResultRoot.GetChild(i).gameObject);
-            BleApi.StartDeviceScan();
-            isScanningDevices = true;
-            deviceScanButtonText.text = "Stop scan";
-        }
-        else
-        {
-            // stop scan
-            isScanningDevices = false;
-            BleApi.StopDeviceScan();
-            deviceScanButtonText.text = "Start scan";
-        }
+        // start new scan
+        for (int i = scanResultRoot.childCount - 1; i >= 0; i--)
+            Destroy(scanResultRoot.GetChild(i).gameObject);
+        BleApi.StartDeviceScan();
+        isScanningDevices = true;
+
     }
 
     public void SelectDevice(GameObject data)
@@ -168,7 +158,7 @@ public class Demo : MonoBehaviour
         for (int i = 0; i < scanResultRoot.transform.childCount; i++)
         {
             var child = scanResultRoot.transform.GetChild(i).gameObject;
-            child.transform.GetChild(0).GetComponent<Text>().color = child == data ? Color.red :
+            child.transform.GetChild(0).GetComponent<Text>().color = child == data ? new Color(62, 163, 77) :
                 deviceScanResultProto.transform.GetChild(0).GetComponent<Text>().color;
         }
         selectedDeviceId = data.name;
@@ -217,6 +207,8 @@ public class Demo : MonoBehaviour
 
     public void GoToLevel()
     {
-        SceneManager.LoadScene("Level");
+        SceneManager.LoadScene("UIHeartrate");
     }
+
+
 }
