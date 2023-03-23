@@ -11,25 +11,20 @@ using UnityEngine.SceneManagement;
 
 public class Demo : MonoBehaviour
 {
-    public bool isScanningDevices = false;
-    public bool isScanningServices = false;
-    public bool isScanningCharacteristics = false;
-    public bool isSubscribed = false;
+    private bool isScanningDevices = false;
+    private bool isScanningServices = false;
+    private bool isScanningCharacteristics = false;
+    private bool isSubscribed = false;
     public Text deviceScanButtonText;
     public GameObject deviceScanResultProto;
     public Button serviceScanButton;
     public Button gameButton;
     public Text subcribeText;
-    public Text errorText;
     public HeartRateCharacteristic heartRateCharacteristic;
 
 
     Transform scanResultRoot;
-    public string selectedDeviceId;
-    public string selectedServiceId;
-    public string selectedCharacteristicId;
     Dictionary<string, Dictionary<string, string>> devices = new Dictionary<string, Dictionary<string, string>>();
-    string lastError;
 
     // Start is called before the first frame update
     void Start()
@@ -130,12 +125,10 @@ public class Demo : MonoBehaviour
         {
             // log potential errors
             BleApi.ErrorMessage res = new BleApi.ErrorMessage();
-            BleApi.GetError(out res);
-            if (lastError != res.msg)
+            BleApi.GetError(out res);    
+            if (res.msg != "Ok")
             {
                 UnityEngine.Debug.LogError(res.msg);
-                errorText.text = res.msg;
-                lastError = res.msg;
             }
         }
     }
@@ -163,7 +156,6 @@ public class Demo : MonoBehaviour
             child.transform.GetChild(0).GetComponent<Text>().color = child == data ? new Color(62, 163, 77) :
                 deviceScanResultProto.transform.GetChild(0).GetComponent<Text>().color;
         }
-        selectedDeviceId = data.name;
         serviceScanButton.interactable = true;
         heartRateCharacteristic.hrName = data.name;
     }
@@ -173,14 +165,13 @@ public class Demo : MonoBehaviour
         if (!isScanningServices)
         {
             // start new scan
-            BleApi.ScanServices(selectedDeviceId);
+            BleApi.ScanServices(heartRateCharacteristic.hrName);
             isScanningServices = true;
         }
     }
 
     public void SelectService(string serviceuuid)
     {
-        selectedServiceId = serviceuuid;
         heartRateCharacteristic.serviceId = serviceuuid;
     }
 
@@ -189,21 +180,20 @@ public class Demo : MonoBehaviour
         if (!isScanningCharacteristics)
         {
             // start new scan
-            BleApi.ScanCharacteristics(selectedDeviceId, selectedServiceId);
+            BleApi.ScanCharacteristics(heartRateCharacteristic.hrName, heartRateCharacteristic.serviceId);
             isScanningCharacteristics = true;
         }
     }
 
     public void SelectCharacteristic(string uuid)
     {
-        selectedCharacteristicId = uuid;
         heartRateCharacteristic.characteristicId = uuid;
     }
 
     public void Subscribe()
     {
         // no error code available in non-blocking mode
-        BleApi.SubscribeCharacteristic(selectedDeviceId, selectedServiceId, selectedCharacteristicId, false);
+        BleApi.SubscribeCharacteristic(heartRateCharacteristic.hrName, heartRateCharacteristic.serviceId, heartRateCharacteristic.characteristicId, false);
         isSubscribed = true;
     }
 
@@ -211,6 +201,4 @@ public class Demo : MonoBehaviour
     {
         SceneManager.LoadScene("UIHeartrate");
     }
-
-
 }
