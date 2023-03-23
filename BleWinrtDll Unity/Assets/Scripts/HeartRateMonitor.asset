@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bd79d00962a17948a5bde3a79890334, type: 3}
   m_Name: HeartRateMonitor
   m_EditorClassIdentifier: 
-  hrName: 
-  serviceId: 
-  characteristicId: 
+  hrName: BluetoothLE#BluetoothLEa0:e7:0b:29:f5:6c-c7:ed:18:9c:24:80
+  serviceId: '{0000180d-0000-1000-8000-00805f9b34fb}'
+  characteristicId: '{00002a37-0000-1000-8000-00805f9b34fb}'
