@@ -21,6 +21,8 @@ public class Demo : MonoBehaviour
     public Button gameButton;
     public Text subcribeText;
     public Text errorText;
+    public HeartRateCharacteristic heartRateCharacteristic;
+
 
     Transform scanResultRoot;
     public string selectedDeviceId;
@@ -171,6 +173,7 @@ public class Demo : MonoBehaviour
         }
         selectedDeviceId = data.name;
         serviceScanButton.interactable = true;
+        heartRateCharacteristic.hrName = data.name;
     }
 
     public void StartServiceScan()
@@ -186,6 +189,7 @@ public class Demo : MonoBehaviour
     public void SelectService(string serviceuuid)
     {
         selectedServiceId = serviceuuid;
+        heartRateCharacteristic.serviceId = serviceuuid;
     }
 
     public void StartCharacteristicScan()
@@ -201,6 +205,7 @@ public class Demo : MonoBehaviour
     public void SelectCharacteristic(string uuid)
     {
         selectedCharacteristicId = uuid;
+        heartRateCharacteristic.characteristicId = uuid;
     }
 
     public void Subscribe()
