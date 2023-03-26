@@ -393,8 +393,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2031387673}
-        m_TargetAssemblyTypeName: Demo, Assembly-CSharp
+      - m_Target: {fileID: 2031387675}
+        m_TargetAssemblyTypeName: Demo1, Assembly-CSharp
         m_MethodName: GoToLevel
         m_Mode: 1
         m_Arguments:
@@ -1909,7 +1909,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2031387672}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4d13c1e7e800d8a4897532f0bd2960aa, type: 3}
   m_Name: 
@@ -1943,12 +1943,15 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2031387672}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7ff32611dadc2a44bb2348f33256255e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   deviceScanResultProto: {fileID: 1958582647}
+  heartRateCharacteristic: {fileID: 11400000, guid: 467268a19229cf74d808ac21e0619fc0,
+    type: 2}
+  subcribeText: {fileID: 1439417843}
   isScanning: 0
   isConnected: 0
 --- !u!1 &2048589276

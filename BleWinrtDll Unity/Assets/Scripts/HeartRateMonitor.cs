@@ -7,6 +7,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+
 public class HeartRateMonitor : MonoBehaviour
 {
     public HeartRateCharacteristic heartRateCharacteristic;
@@ -18,7 +19,7 @@ public class HeartRateMonitor : MonoBehaviour
         string selectedDeviceId = heartRateCharacteristic.hrName;
         string selectedServiceId = heartRateCharacteristic.serviceId;
         string selectedCharacteristicId = heartRateCharacteristic.characteristicId;
-
+        Debug.Log("In the monitor");
         // Subscribe to the heartrate monitor again
         BleApi.SubscribeCharacteristic(selectedDeviceId, selectedServiceId, selectedCharacteristicId, false);
         

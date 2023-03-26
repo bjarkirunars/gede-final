@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 //using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -142,9 +143,9 @@ public class BLE
             {
                 if (res.nameUpdated)
                 {
-                    
 
-                    
+
+
                     if (res.name != "") //== "Bjarkiiii")
                     {
                         deviceIds.Add(res.id);
@@ -164,27 +165,44 @@ public class BLE
         scanThread.Start();
         return currentScan;
     }
-    public bool CheackServices(string deviceId)
-    {
-        bool found = false;
-        {
-            Impl.ScanServices(deviceId);
-            Impl.Service service = new Impl.Service();
-        
-            while (Impl.PollService(out service, true) != Impl.ScanStatus.FINISHED)
-            {
-                Debug.Log(service.uuid);
-                if (service.uuid.StartsWith("{0000180d"))
-                {
-                    Debug.Log(service.uuid[0]);
-                    found = true;
-
-                }
-            }
-            IdThread = null;
-        }
+    public Tuple<string, string[]> CheckServices(string deviceId)
+    {    
+        Impl.ScanServices(deviceId);
+        Impl.Service service = new Impl.Service();
+        string[] chars = new string[8];
        
-        return found;
+        while (Impl.PollService(out service, true) != Impl.ScanStatus.FINISHED)
+        {
+            // Debug.Log(service.uuid);
+
+            if (service.uuid.StartsWith("{0000180d"))//000018d0
+            {
+                Impl.ScanCharacteristics(deviceId, service.uuid);
+
+                Impl.Characteristic c = new Impl.Characteristic();
+                    
+                int count = 0;
+                int i = 0;
+                while (Impl.PollCharacteristic(out c, true) != Impl.ScanStatus.FINISHED)
+                {
+                    if (c.uuid != null || c.uuid != "")
+                    {
+                        Debug.Log($"Characteristic in while for {deviceId} and service {service.uuid}: " + c.uuid);
+                        chars[i] = c.uuid;
+                        i++;
+                    }
+                    if (count == 5)
+                        return Tuple.Create(service.uuid, chars);
+                    count++;
+                }
+                        
+                return Tuple.Create(service.uuid, chars);
+
+            }
+        }
+        IdThread = null;
+        
+    return Tuple.Create("not found", chars);
         
     }
 
@@ -203,27 +221,25 @@ public class BLE
             Debug.Log("characteristic found: " + c.uuid + ", user description: " + c.userDescription);
     }
 
-    public static bool Subscribe(string deviceId, string serviceUuids, string[] characteristicUuids)
+    public static bool Subscribe(string deviceId, string serviceUuids, string characteristicUuid)
     {
-        foreach (string characteristicUuid in characteristicUuids)
-        {
-            bool res = Impl.SubscribeCharacteristic(deviceId, serviceUuids, characteristicUuid);
-            if (!res)
-                return false;
-        }
+        Debug.Log("characteristic to connect to: " + characteristicUuid);
+        bool res = Impl.SubscribeCharacteristic(deviceId, serviceUuids, characteristicUuid);
+        if (!res)
+            return false;
         return true;
     }
 
-    public bool Connect(string deviceId, string serviceUuid, string[] characteristicUuids)
+    public bool Connect(string deviceId, string serviceUuids, string characteristicUuid)
     {
         if (isConnected)
             return false;
         Debug.Log("retrieving ble profile...");
-        RetrieveProfile(deviceId, serviceUuid);
+        RetrieveProfile(deviceId, serviceUuids);
         if (GetError() != "Ok")
             throw new Exception("Connection failed: " + GetError());
         Debug.Log("subscribing to characteristics...");
-        bool result = Subscribe(deviceId, serviceUuid, characteristicUuids);
+        bool result = Subscribe(deviceId, serviceUuids, characteristicUuid);
         if (GetError() != "Ok" || !result)
             throw new Exception("Connection failed: " + GetError());
         isConnected = true;

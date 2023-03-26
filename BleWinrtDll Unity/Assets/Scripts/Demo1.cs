@@ -6,14 +6,19 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
 
 public class Demo1 : MonoBehaviour
 {
     public GameObject deviceScanResultProto;
     Transform scanResultRoot;
+    public HeartRateCharacteristic heartRateCharacteristic;
+    public Text subcribeText;
 
     // Start is called before the first frame update
     BLE ble;
@@ -23,7 +28,12 @@ public class Demo1 : MonoBehaviour
     IDictionary<string, string> discoveredDevices = new Dictionary<string, string>();
     int devicesCount = 0;
     List<string> devices = new List<string>();
+    List<string> donecheck = new List<string>();
     int index = 0;
+    bool added = false;
+    string devid;
+    string[] characteristic;
+    bool connecting = false;
 
     // BLE Threads 
     Thread scanningThread, connectionThread, readingThread;
@@ -38,16 +48,16 @@ public class Demo1 : MonoBehaviour
     }
 
 
-
-
     private void ReadBleData(object obj)
     {
         byte[] packageReceived = BLE.ReadBytes();
         // Convert little Endian.
         // In this example we're interested about an angle
         // value on the first field of our package.
-        remoteAngle = packageReceived[1];
-        Debug.Log("HR: " + remoteAngle);
+        if (packageReceived != null && packageReceived.Length > 1)
+        {
+            remoteAngle = packageReceived[1];
+        }
         //Thread.Sleep(100);
     }
 
@@ -57,20 +67,69 @@ public class Demo1 : MonoBehaviour
         if (isScanning)
         {
             devicesCount = discoveredDevices.Count;
+            if (deviceId != null && deviceId != "-1" && added)
+            {
+                GameObject g = Instantiate(deviceScanResultProto, scanResultRoot);
+                g.name = deviceId;
+                g.transform.GetChild(0).GetComponent<Text>().text = discoveredDevices[deviceId];
+                g.transform.GetChild(1).GetComponent<Text>().text = deviceId;
+                //deviceId = null;
+                added = false;
+            }
         }
-        if (devices.Count != 0 && connectionThread == null) {
-            Debug.Log(devices);
-            index = 0;
-            StartConHandler();
-        }
-
-        if (deviceId != null && deviceId != "-1")
+        else
         {
-            GameObject g = Instantiate(deviceScanResultProto, scanResultRoot);
-            g.name = deviceId;
-            g.transform.GetChild(0).GetComponent<Text>().text = discoveredDevices[deviceId];
-            g.transform.GetChild(1).GetComponent<Text>().text = deviceId;
-            deviceId = null;
+            if (deviceId != null && deviceId != "-1")
+            {
+                if (ble.isConnected)
+                {
+                    UpdateGuiText("writeData");
+                }
+                if (!ble.isConnected)
+                {
+                    if (scanningThread == null && connectionThread == null && !connecting)
+                    {
+                        connecting = true;
+                        StartConHandler();
+                    }
+                }
+                else
+                {
+                    connecting = false;
+                }
+            }
+
+
+        }
+    }
+    void UpdateGuiText(string action)
+    {
+        switch (action)
+        {
+            case "scan":
+                
+                foreach (KeyValuePair<string, string> entry in discoveredDevices)
+                {
+                    Debug.Log("DeviceID: " + entry.Key + "\nDeviceName: " + entry.Value + "\n\n");
+                    Debug.Log("Added device: " + entry.Key);
+                }
+                break;
+            case "connected":
+               
+                Debug.Log("Connected to target device:\n" + discoveredDevices[deviceId]);
+                break;
+            case "writeData":
+                if (!readingThread.IsAlive)
+                {
+                    readingThread = new Thread(ReadBleData);
+                    readingThread.Start();
+                }
+                if (remoteAngle != lastRemoteAngle)
+                {
+                    subcribeText.text = remoteAngle + "bpm";
+                    lastRemoteAngle = remoteAngle;
+                }
+                break;
         }
     }
 
@@ -101,26 +160,14 @@ public class Demo1 : MonoBehaviour
         Debug.Log("BLE.ScanDevices() started.");
         scan.Found = (_deviceId, deviceName) =>
         {
-            Debug.Log("found device with name: " + deviceName);
-
-            
+            // Debug.Log("found device with name: " + deviceName);
             if (!discoveredDevices.ContainsKey(_deviceId))
             {
-                
-                //devices.Add(_deviceId);
-                //StartConHandler();
                 devices.Add(_deviceId);
-            
+                devid = _deviceId;
                 discoveredDevices.Add(_deviceId, deviceName);
-                
-                
+                ConnectBleDevice();
             }
-            
-            
-
-            //if (deviceId == null && deviceName == targetDeviceName)
-             //   deviceId = _deviceId;
-
         };
 
         scan.Finished = () =>
@@ -130,13 +177,11 @@ public class Demo1 : MonoBehaviour
             if (deviceId == null)
                 deviceId = "-1";
         };
-        while (deviceId == null || connectionThread != null)
-            Thread.Sleep(1000);
+        while (deviceId == null)
+            Thread.Sleep(500);
         scan.Cancel();
         scanningThread = null;
         isScanning = false;
-        isScanning = false;
-
         if (deviceId == "-1")
         {
             Debug.Log("no device found!");
@@ -146,26 +191,55 @@ public class Demo1 : MonoBehaviour
 
     public void StartConHandler()
     {
-        connectionThread = new Thread(ConnectBleDevice);
+        connectionThread = new Thread(ConnectDevice);
+       
         connectionThread.Start();
-        
+        connectionThread.Join();
+    }
+
+
+    public void ConnectDevice() {
+        Debug.Log($" in connecting");
+        if (heartRateCharacteristic.hrName != null)
+        {
+            Debug.Log($" device {heartRateCharacteristic.hrName}");
+            Debug.Log($" service {heartRateCharacteristic.serviceId}");
+
+            try
+            {
+                foreach (string characteristicUuid in characteristic)
+                {
+                    if (string.IsNullOrEmpty(characteristicUuid)) continue;
+                    heartRateCharacteristic.characteristicId = characteristicUuid;
+                }
+                ble.Connect(heartRateCharacteristic.hrName, heartRateCharacteristic.serviceId, heartRateCharacteristic.characteristicId);
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Could not establish connection to device with ID " + heartRateCharacteristic.hrName + $" service {heartRateCharacteristic.serviceId}" + e);
+            }
+        }
+        if (ble.isConnected)
+            Debug.Log("Connected to: " + discoveredDevices[deviceId]);
+
     }
     void ConnectBleDevice()
     {
-        print("connectThreatenters Ble");
-        Debug.Log("cheacking device: " + discoveredDevices[devices[index]]);
-        if (ble.CheackServices(devices[index]))
-        {
-            Debug.Log("Devicefound with 180d: " + discoveredDevices[devices[index]]);
-            deviceId= devices[index];
-        }
-        else
-            Debug.Log("Device " + discoveredDevices[devices[index]] + " doesn't have 180d");
-        devices.RemoveAt(index);
-        index++;
-        connectionThread = null;
+        // print("connectThreatenters Ble");
+        Tuple<string, string[]> ids = ble.CheckServices(devid);
 
+        if (ids.Item1 != "not found")
+        {
+            Debug.Log("Devicefound with 180d: " + discoveredDevices[devid]);
+            deviceId = devid;
+            heartRateCharacteristic.hrName = devid;
+            heartRateCharacteristic.serviceId = ids.Item1;
+            characteristic = ids.Item2;
+            added = true;
+        }
+        donecheck.Add(heartRateCharacteristic.hrName);
     }
+
     private void OnDestroy()
     {
         CleanUp();
@@ -192,6 +266,11 @@ public class Demo1 : MonoBehaviour
         {
             Debug.Log("Thread or object never initialized.\n" + e);
         }
+    }
+
+    public void GoToLevel()
+    {
+        SceneManager.LoadScene("UIHeartrate");
     }
 }
  
