@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 
 public class Demo1 : MonoBehaviour
@@ -44,6 +45,17 @@ public class Demo1 : MonoBehaviour
         readingThread = new Thread(ReadBleData);
         StartScanHandler();
         DontDestroyOnLoad(this.gameObject);
+        try
+        {
+            Button gameButton = GameObject.Find("StartButton").GetComponent<Button>();
+            gameButton.interactable = false;
+            TextMeshProUGUI buttonText = gameButton.GetComponentInChildren<TextMeshProUGUI>();
+            buttonText.text = "Loading..";
+        }
+        catch (Exception)
+        {
+
+        }
     }
 
 
@@ -123,12 +135,16 @@ public class Demo1 : MonoBehaviour
                     readingThread = new Thread(ReadBleData);
                     readingThread.Start();
                 }
+                Debug.Log("Connected to target device:\n" + discoveredDevices[deviceId] + " - " + deviceId);
+
                 if (remoteAngle != lastRemoteAngle)
                 {
                     try
                     {
                         Button gameButton = GameObject.Find("StartButton").GetComponent<Button>();
                         gameButton.interactable = true;
+                        TextMeshProUGUI buttonText = gameButton.GetComponentInChildren<TextMeshProUGUI>();
+                        buttonText.text = $"Start - {remoteAngle}bpm";
                     }
                     catch (Exception)
                     {
@@ -136,8 +152,9 @@ public class Demo1 : MonoBehaviour
                     }
                     try
                     {
-                        Text subcribeText = GameObject.Find("TextSubscribe").GetComponent<Text>();
+                        TextMeshProUGUI subcribeText = GameObject.Find("TextSubscribe").GetComponent<TextMeshProUGUI>();
                         subcribeText.text = remoteAngle + "bpm";
+                        heartRateCharacteristic.bpm = remoteAngle.ToString();
                     }
                     catch (Exception)
                     {
