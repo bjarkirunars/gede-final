@@ -481,7 +481,7 @@ GameObject:
   - component: {fileID: 1719250767}
   - component: {fileID: 1719250766}
   m_Layer: 5
-  m_Name: Hrdata
+  m_Name: TextSubscribe
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -540,7 +540,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: New Text
+  m_Text: Loading..
 --- !u!222 &1719250767
 CanvasRenderer:
   m_ObjectHideFlags: 0

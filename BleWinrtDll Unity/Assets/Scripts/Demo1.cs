@@ -18,7 +18,6 @@ public class Demo1 : MonoBehaviour
     public GameObject deviceScanResultProto;
     Transform scanResultRoot;
     public HeartRateCharacteristic heartRateCharacteristic;
-    public Text subcribeText;
 
     // Start is called before the first frame update
     BLE ble;
@@ -45,6 +44,7 @@ public class Demo1 : MonoBehaviour
         ble = new BLE();
         readingThread = new Thread(ReadBleData);
         StartScanHandler();
+        DontDestroyOnLoad(this.gameObject);
     }
 
 
@@ -126,7 +126,24 @@ public class Demo1 : MonoBehaviour
                 }
                 if (remoteAngle != lastRemoteAngle)
                 {
-                    subcribeText.text = remoteAngle + "bpm";
+                    try
+                    {
+                        Button gameButton = GameObject.Find("ButtonGame").GetComponent<Button>();
+                        gameButton.interactable = true;
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+                    try
+                    {
+                        Text subcribeText = GameObject.Find("TextSubscribe").GetComponent<Text>();
+                        subcribeText.text = remoteAngle + "bpm";
+                    }
+                    catch (Exception)
+                    {
+
+                    }
                     lastRemoteAngle = remoteAngle;
                 }
                 break;

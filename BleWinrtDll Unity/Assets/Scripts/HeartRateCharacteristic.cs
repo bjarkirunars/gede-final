@@ -6,4 +6,5 @@ public class HeartRateCharacteristic : ScriptableObject
     public string hrName;
     public string serviceId;
     public string characteristicId;
+    public string bpm;
 }

@@ -22,7 +22,10 @@ public class HeartRateMonitor : MonoBehaviour
         Debug.Log("In the monitor");
         // Subscribe to the heartrate monitor again
         BleApi.SubscribeCharacteristic(selectedDeviceId, selectedServiceId, selectedCharacteristicId, false);
-        
+        GameObject demo1Obj = GameObject.Find("Demo1Object");
+        Demo1 demo1Script = demo1Obj.GetComponent<Demo1>();
+
+
     }
 
     void Update()
