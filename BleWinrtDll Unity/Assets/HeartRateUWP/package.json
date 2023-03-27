@@ -1,0 +1,21 @@
+{
+  "name": "com.reykjavikuniversity.bluetoothuwp",
+  "version": "0.0.3",
+  "displayName": "Bluetooth HR in UWP",
+  "description": "This is a package",
+  "unity": "2021.3",
+  "unityRelease": "17f1",
+  "documentationUrl": "https://github.com/bjarkirunars/gede-final",
+  "changelogUrl": "https://github.com/bjarkirunars/gede-final",
+  "licensesUrl": "",
+  "dependencies": {
+ },
+ "keywords": [
+    "bluetooth"
+  ],
+  "author": {
+    "name": "Bjarki,Tomas,Elmar",
+    "email": "bjarkir22@ru.is",
+    "url": "https://github.com/bjarkirunars/gede-final"
+  }
+}

@@ -18,7 +18,7 @@ EditorBuildSettings:
     path: Assets/Scenes/UIStart.unity
     guid: 4bd10520f014f4c41afac1586e840893
   - enabled: 1
-    path: Assets/Scenes/UIConnect.unity
+    path: Assets/HeartRateUWP/UIConnect.unity
     guid: 36694df9088ee994384719d768fc5681
   - enabled: 1
     path: Assets/Scenes/UIHeartrate.unity

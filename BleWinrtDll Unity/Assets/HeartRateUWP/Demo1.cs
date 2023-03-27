@@ -28,7 +28,6 @@ public class Demo1 : MonoBehaviour
     int devicesCount = 0;
     List<string> devices = new List<string>();
     List<string> donecheck = new List<string>();
-    int index = 0;
     bool added = false;
     string devid;
     string[] characteristic;
@@ -128,7 +127,7 @@ public class Demo1 : MonoBehaviour
                 {
                     try
                     {
-                        Button gameButton = GameObject.Find("ButtonGame").GetComponent<Button>();
+                        Button gameButton = GameObject.Find("StartButton").GetComponent<Button>();
                         gameButton.interactable = true;
                     }
                     catch (Exception)
